@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝塔邮局工具套件</title>
+    <style>
+        /* 全局样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* 主容器 */
+        .main-container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        /* 选项卡导航 */
+        .tabs {
+            display: flex;
+            background: #2c3e50;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: 15px 20px;
+            background: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab-button:hover {
+            background: #3d566e;
+        }
+        
+        .tab-button.active {
+            background: #3498db;
+        }
+        
+        /* 工具容器 */
+        .tool-container {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tool-container.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 工具1样式 */
+        #tool1 .container {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        #tool1 header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #tool1 h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        #tool1 .description {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        #tool1 .main-content {
+            display: flex;
+            padding: 20px;
+        }
+        
+        #tool1 .controls {
+            flex: 1;
+            padding-right: 20px;
+        }
+        
+        #tool1 .preview {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #tool1 .form-group {
+            margin-bottom: 20px;
+        }
+        
+        #tool1 label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        #tool1 input[type="text"],
+        #tool1 input[type="number"],
+        #tool1 input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        #tool1 input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        #tool1 .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        #tool1 .checkbox-group input {
+            margin-right: 10px;
+        }
+        
+        #tool1 button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        #tool1 button:hover {
+            background: #2980b9;
+        }
+        
+        #tool1 .generate-btn {
+            background: #2ecc71;
+        }
+        
+        #tool1 .generate-btn:hover {
+            background: #27ae60;
+        }
+        
+        #tool1 .save-btn {
+            background: #e74c3c;
+        }
+        
+        #tool1 .save-btn:hover {
+            background: #c0392b;
+        }
+        
+        #tool1 .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        
+        #tool1 .result-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        /* 工具2样式 */
+        #tool2 h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        #tool2 .description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        #tool2 .input-section, .output-section {
+            margin-bottom: 25px;
+        }
+        
+        #tool2 h2 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        #tool2 textarea {
+            width: 100%;
+            height: 180px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        #tool2 textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        #tool2 .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        #tool2 button {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #tool2 button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #tool2 button:active {
+            transform: translateY(0);
+        }
+        
+        #tool2 #copyBtn {
+            background: #27ae60;
+        }
+        
+        #tool2 #copyBtn:hover {
+            background: #219653;
+        }
+        
+        #tool2 #clearBtn {
+            background: #e74c3c;
+        }
+        
+        #tool2 #clearBtn:hover {
+            background: #c0392b;
+        }
+        
+        #tool2 .example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin-top: 20px;
+        }
+        
+        #tool2 .example h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        #tool2 .example p {
+            font-family: monospace;
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        #tool2 .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        #tool2 .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        #tool2 .instructions ul {
+            padding-left: 20px;
+        }
+        
+        #tool2 .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        /* 工具3样式 */
+        #tool3 h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        #tool3 .description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        #tool3 .input-group {
+            margin-bottom: 20px;
+        }
+        
+        #tool3 label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        #tool3 input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        #tool3 input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        #tool3 textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        #tool3 button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        #tool3 button:hover {
+            background: #2980b9;
+        }
+        
+        #tool3 .result-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        #tool3 .result-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        #tool3 .result-item {
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        
+        #tool3 .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        #tool3 .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #tool3 .btn-copy {
+            background: #27ae60;
+        }
+        
+        #tool3 .btn-copy:hover {
+            background: #219653;
+        }
+        
+        #tool3 .btn-download {
+            background: #9b59b6;
+        }
+        
+        #tool3 .btn-download:hover {
+            background: #8e44ad;
+        }
+        
+        #tool3 .example {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        #tool3 .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        #tool3 .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            #tool1 .main-content {
+                flex-direction: column;
+            }
+            
+            #tool1 .controls {
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            #tool2 .buttons {
+                flex-direction: column;
+            }
+            
+            #tool2 button {
+                width: 100%;
+            }
+            
+            #tool3 .actions {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- 选项卡导航 -->
+        <div class="tabs">
+            <button class="tab-button active" data-tool="tool1">账号批量生成</button>
+            <button class="tab-button" data-tool="tool2">批量转换工具</button>
+            <button class="tab-button" data-tool="tool3">收件链接合成</button>
+        </div>
+        
+        <!-- 工具1：账号批量生成 -->
+        <div id="tool1" class="tool-container active">
+            <div class="container">
+                <header>
+                    <h1>宝塔邮局账号批量生成工具</h1>
+                    <p class="description">快速生成符合格式要求的邮箱账号</p>
+                </header>
+                
+                <div class="main-content">
+                    <div class="controls">
+                        <div class="form-group">
+                            <label for="prefix">账号前缀（可选）</label>
+                            <input type="text" id="prefix" placeholder="例如：support">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="length">账号总长度</label>
+                            <input type="number" id="length" value="10" min="6" max="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="count">生成账号数量</label>
+                            <input type="number" id="count" value="5" min="1" max="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="domain">邮箱域名</label>
+                            <input type="text" id="domain" value="example.com">
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="fixedPassword">
+                            <label for="fixedPassword">使用固定密码</label>
+                        </div>
+                        
+                        <div class="form-group" id="fixedPasswordGroup" style="display: none;">
+                            <label for="password">固定密码</label>
+                            <input type="password" id="password" placeholder="输入固定密码">
+                        </div>
+                        
+                        <button class="generate-btn" id="generateBtn">生成账号</button>
+                        <button class="save-btn" id="saveBtn" disabled>保存到本地</button>
+                    </div>
+                    
+                    <div class="preview">
+                        <div class="result-header">生成结果预览</div>
+                        <div id="resultContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 工具2：批量转换工具 -->
+        <div id="tool2" class="tool-container">
+            <h1>宝塔邮局批量转换工具</h1>
+            <p class="description">将宝塔邮局格式转换为指定格式：username|username@domain.com|password|5|GB</p>
+            
+            <div class="input-section">
+                <h2>输入（每行一个）</h2>
+                <textarea id="inputText" placeholder="请输入要转换的内容，每行一个，例如：
+user1@example.com----password123
+user2@example.com----password123
+..."></textarea>
+            </div>
+            
+            <div class="buttons">
+                <button id="convertBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                        <path d="M8 1a7 7 0 0 1 7 7v1h-2V8A5 5 0 0 0 3 8v1H1V8a7 7 0 0 1 7-7z"/>
+                        <path d="M7 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                    </svg>
+                    转换
+                </button>
+                <button id="copyBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                    </svg>
+                    复制结果
+                </button>
+                <button id="clearBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                    清空
+                </button>
+            </div>
+            
+            <div class="output-section">
+                <h2>转换结果</h2>
+                <textarea id="outputText" readonly></textarea>
+            </div>
+            
+            <div class="example">
+                <h3>示例</h3>
+                <p>输入: 52ksd2u3@example.com----123456</p>
+                <p>输出: 52ksd2u3|52ksd2u3@example.com|123456|5|GB</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>使用说明</h3>
+                <ul>
+                    <li>在左侧输入框中粘贴或输入需要转换的内容，每行一个</li>
+                    <li>点击"转换"按钮进行格式转换</li>
+                    <li>转换完成后，结果会显示在右侧输出框中</li>
+                    <li>点击"复制结果"按钮可以将输出内容复制到剪贴板</li>
+                    <li>点击"清空"按钮可以清除所有输入和输出内容</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 工具3：收件链接合成 -->
+        <div id="tool3" class="tool-container">
+            <h1>邮局api收件链接合并工具</h1>
+            <p class="description">将基础URL与多个路径合并，批量生成完整链接</p>
+            
+            <div class="example">
+                <strong>使用示例：</strong><br>
+                基础URL：https://example.com/api/sj.php?email=<br>
+                路径内容：about<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contact<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;products<br>
+                生成结果：https://example.com/api/sj.php?email=about@xx.com<br>
+                 https://example.com/api/sj.php?email=contact@xx.com<br>
+                 https://example.com/api/sj.php?email=products@xx.com
+            </div>
+            
+            <div class="input-group">
+                <label for="baseUrl">基础URL（只能填写一个链接）</label>
+                <input type="text" id="baseUrl" placeholder="例如：https://example.com/api/sj.php?email=">
+                <div class="error" id="urlError">请输入有效的URL（以http://或https://开头）</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="paths">路径内容（每行一个路径）</label>
+                <textarea id="paths" placeholder="例如：about@xx.com&#10;contact@xx.com&#10;products@xx.com"></textarea>
+                <div class="error" id="pathsError">请至少输入一个路径</div>
+            </div>
+            
+            <button id="generateBtn3">生成链接</button>
+            
+            <div class="success-message" id="successMessage">链接已成功生成！</div>
+            
+            <div class="result-container" id="resultContainer3">
+                <h3>生成结果：</h3>
+                <div class="result-box" id="resultBox">
+                    <!-- 结果将在这里显示 -->
+                </div>
+                
+                <div class="actions">
+                    <button class="btn-copy" id="copyBtn3">复制到剪贴板</button>
+                    <button class="btn-download" id="downloadBtn">下载为文本文件</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 宝塔邮局工具套件 | 一站式邮箱管理解决方案</p>
+    </footer>
+
+    <script>
+        // 选项卡切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const toolContainers = document.querySelectorAll('.tool-container');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const toolId = button.getAttribute('data-tool');
+                    
+                    // 更新活动选项卡
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // 显示对应工具
+                    toolContainers.forEach(container => {
+                        container.classList.remove('active');
+                        if (container.id === toolId) {
+                            container.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // 工具1：账号批量生成功能
+            const fixedPasswordCheckbox = document.getElementById('fixedPassword');
+            const fixedPasswordGroup = document.getElementById('fixedPasswordGroup');
+            const generateBtn = document.getElementById('generateBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            let generatedAccounts = [];
+            
+            // 显示/隐藏固定密码输入框
+            fixedPasswordCheckbox.addEventListener('change', function() {
+                fixedPasswordGroup.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // 生成随机字符串
+            function generateRandomString(length, useNumbers = true, useLetters = true) {
+                let chars = '';
+                if (useLetters) chars += 'abcdefghijklmnopqrstuvwxyz';
+                if (useNumbers) chars += '0123456789';
+                
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // 生成随机密码
+            function generatePassword() {
+                return generateRandomString(12, true, true);
+            }
+            
+            // 生成账号
+            generateBtn.addEventListener('click', function() {
+                const prefix = document.getElementById('prefix').value;
+                const totalLength = parseInt(document.getElementById('length').value);
+                const count = parseInt(document.getElementById('count').value);
+                const domain = document.getElementById('domain').value;
+                const useFixedPassword = document.getElementById('fixedPassword').checked;
+                const fixedPassword = document.getElementById('password').value;
+                
+                generatedAccounts = [];
+                resultContainer.innerHTML = '';
+                
+                for (let i = 0; i < count; i++) {
+                    // 生成随机部分
+                    const randomPartLength = prefix ? totalLength - prefix.length : totalLength;
+                    const randomPart = generateRandomString(randomPartLength, true, true);
+                    
+                    // 生成完整账号
+                    const username = prefix ? prefix + randomPart : randomPart;
+                    const email = username + '@' + domain;
+                    
+                    // 生成密码
+                    const password = useFixedPassword && fixedPassword ? fixedPassword : generatePassword();
+                    
+                    // 创建账号对象
+                    const account = {
+                        username: username,
+                        email: email,
+                        password: password,
+                        space: '5',
+                        unit: 'GB'
+                    };
+                    
+                    generatedAccounts.push(account);
+                    
+                    // 添加到预览
+                    const accountElement = document.createElement('div');
+                    accountElement.className = 'result-item';
+                    accountElement.textContent = `${account.username}|${account.email}|${account.password}|${account.space}|${account.unit}`;
+                    resultContainer.appendChild(accountElement);
+                }
+                
+                saveBtn.disabled = false;
+            });
+            
+            // 保存到本地
+            saveBtn.addEventListener('click', function() {
+                if (generatedAccounts.length === 0) return;
+                
+                let content = '';
+                for (const account of generatedAccounts) {
+                    content += `${account.email}----${account.password}\n`;
+                }
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bt_mail_accounts.txt';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            });
+            
+            // 工具2：批量转换功能
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const convertBtn = document.getElementById('convertBtn');
+            const copyBtn2 = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            // 转换功能
+            convertBtn.addEventListener('click', function() {
+                const input = inputText.value.trim();
+                if (!input) {
+                    outputText.value = '请输入要转换的内容';
+                    return;
+                }
+                
+                const lines = input.split('\n');
+                const outputLines = [];
+                
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) continue;
+                    
+                    // 检查格式是否正确
+                    if (!trimmedLine.includes('----')) {
+                        outputLines.push(`无效格式: ${trimmedLine}`);
+                        continue;
+                    }
+                    
+                    const [emailPart, password] = trimmedLine.split('----');
+                    const atIndex = emailPart.indexOf('@');
+                    
+                    if (atIndex === -1) {
+                        outputLines.push(`无效邮箱格式: ${emailPart}`);
+                        continue;
+                    }
+                    
+                    const username = emailPart.substring(0, atIndex);
+                    const domain = emailPart.substring(atIndex + 1);
+                    
+                    outputLines.push(`${username}|${emailPart}|${password}|5|GB`);
+                }
+                
+                outputText.value = outputLines.join('\n');
+            });
+            
+            // 复制功能
+            copyBtn2.addEventListener('click', function() {
+                if (!outputText.value) {
+                    alert('没有内容可复制');
+                    return;
+                }
+                
+                outputText.select();
+                document.execCommand('copy');
+                
+                // 显示复制成功提示
+                const originalText = copyBtn2.textContent;
+                copyBtn2.textContent = '已复制!';
+                
+                setTimeout(() => {
+                    copyBtn2.textContent = originalText;
+                }, 1500);
+            });
+            
+            // 清空功能
+            clearBtn.addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+            
+            // 工具3：链接合并功能
+            const baseUrlInput = document.getElementById('baseUrl');
+            const pathsInput = document.getElementById('paths');
+            const generateBtn3 = document.getElementById('generateBtn3');
+            const resultContainer3 = document.getElementById('resultContainer3');
+            const resultBox = document.getElementById('resultBox');
+            const copyBtn3 = document.getElementById('copyBtn3');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const urlError = document.getElementById('urlError');
+            const pathsError = document.getElementById('pathsError');
+            const successMessage = document.getElementById('successMessage');
+            
+            // 生成链接
+            generateBtn3.addEventListener('click', function() {
+                // 重置错误消息
+                urlError.style.display = 'none';
+                pathsError.style.display = 'none';
+                successMessage.style.display = 'none';
+                
+                const baseUrl = baseUrlInput.value.trim();
+                const pathsText = pathsInput.value.trim();
+                
+                // 验证输入
+                let isValid = true;
+                
+                if (!isValidUrl(baseUrl)) {
+                    urlError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (pathsText === '') {
+                    pathsError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // 处理路径
+                const paths = pathsText.split('\n')
+                    .map(path => path.trim())
+                    .filter(path => path !== '');
+                
+                // 生成结果
+                const results = paths.map(path => {
+                    // 确保基础URL以斜杠结尾，且路径不以斜杠开头
+                    let cleanBaseUrl = baseUrl;
+                    if (!cleanBaseUrl.endsWith('/')) {
+                        cleanBaseUrl += '/';
+                    }
+                    
+                    let cleanPath = path;
+                    if (cleanPath.startsWith('/')) {
+                        cleanPath = cleanPath.substring(1);
+                    }
+                    
+                    return cleanBaseUrl + cleanPath;
+                });
+                
+                // 显示结果
+                resultBox.innerHTML = '';
+                results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.textContent = result;
+                    resultBox.appendChild(div);
+                });
+                
+                resultContainer3.style.display = 'block';
+                successMessage.style.display = 'block';
+                
+                // 存储结果以供下载和复制
+                resultBox.dataset.results = results.join('\n');
+            });
+            
+            // 复制到剪贴板
+            copyBtn3.addEventListener('click', function() {
+                const results = resultBox.dataset.results;
+                if (!results) return;
+                
+                navigator.clipboard.writeText(results).then(() => {
+                    const originalText = copyBtn3.textContent;
+                    copyBtn3.textContent = '已复制!';
+                    
+                    setTimeout(() => {
+                        copyBtn3.textContent = originalText;
+                    }, 2000);
+                });
+            });
+            
+            // 下载为文本文件
+            downloadBtn.addEventListener('click', function() {
+                const results = resultBox.dataset.results;
+                if (!results) return;
+                
+                const blob = new Blob([results], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '合并链接.txt';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            });
+            
+            // URL验证函数
+            function isValidUrl(string) {
+                if (string.trim() === '') return false;
+                
+                try {
+                    // 如果用户没有输入协议，添加临时协议进行验证
+                    const urlToCheck = string.includes('://') ? string : 'https://' + string;
+                    new URL(urlToCheck);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

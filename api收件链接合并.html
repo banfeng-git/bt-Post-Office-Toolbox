@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮局api收件链接合成工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .result-item {
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-copy {
+            background: #27ae60;
+        }
+        
+        .btn-copy:hover {
+            background: #219653;
+        }
+        
+        .btn-download {
+            background: #9b59b6;
+        }
+        
+        .btn-download:hover {
+            background: #8e44ad;
+        }
+        
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+   <div class="container">
+        <h1>邮局api收件链接合并工具</h1>
+        <p class="description">将基础URL与多个路径合并，批量生成完整链接</p>
+        
+        <div class="example">
+            <strong>使用示例：</strong><br>
+            基础URL：https://example.com/api/sj.php?email=<br>
+            路径内容：about<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contact<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;products<br>
+            生成结果：https://example.com/api/sj.php?email=about@xx.com<br>
+             https://example.com/api/sj.php?email=contact@xx.com<br>
+             https://example.com/api/sj.php?email=products@xx.com
+        </div>
+        
+        <div class="input-group">
+            <label for="baseUrl">基础URL（只能填写一个链接）</label>
+            <input type="text" id="baseUrl" placeholder="例如：https://example.com/api/sj.php?email=">
+            <div class="error" id="urlError">请输入有效的URL（以http://或https://开头）</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="paths">路径内容（每行一个路径）</label>
+            <textarea id="paths" placeholder="例如：about@xx.com&#10;contact@xx.com&#10;products@xx.com"></textarea>
+            <div class="error" id="pathsError">请至少输入一个路径</div>
+        </div>
+        
+        <button id="generateBtn">生成链接</button>
+        
+        <div class="success-message" id="successMessage">链接已成功生成！</div>
+        
+        <div class="result-container" id="resultContainer">
+            <h3>生成结果：</h3>
+            <div class="result-box" id="resultBox">
+                <!-- 结果将在这里显示 -->
+            </div>
+            
+            <div class="actions">
+                <button class="btn-copy" id="copyBtn">复制到剪贴板</button>
+                <button class="btn-download" id="downloadBtn">下载为文本文件</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 链接合并工具 | 简单实用的URL处理工具</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseUrlInput = document.getElementById('baseUrl');
+            const pathsInput = document.getElementById('paths');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultBox = document.getElementById('resultBox');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const urlError = document.getElementById('urlError');
+            const pathsError = document.getElementById('pathsError');
+            const successMessage = document.getElementById('successMessage');
+            
+            // 生成链接
+            generateBtn.addEventListener('click', function() {
+                // 重置错误消息
+                urlError.style.display = 'none';
+                pathsError.style.display = 'none';
+                successMessage.style.display = 'none';
+                
+                const baseUrl = baseUrlInput.value.trim();
+                const pathsText = pathsInput.value.trim();
+                
+                // 验证输入
+                let isValid = true;
+                
+                if (!isValidUrl(baseUrl)) {
+                    urlError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (pathsText === '') {
+                    pathsError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // 处理路径
+                const paths = pathsText.split('\n')
+                    .map(path => path.trim())
+                    .filter(path => path !== '');
+                
+                // 生成结果
+                const results = paths.map(path => {
+                    // 确保基础URL以斜杠结尾，且路径不以斜杠开头
+                    let cleanBaseUrl = baseUrl;
+                    if (!cleanBaseUrl.endsWith('/')) {
+                        cleanBaseUrl += '/';
+                    }
+                    
+                    let cleanPath = path;
+                    if (cleanPath.startsWith('/')) {
+                        cleanPath = cleanPath.substring(1);
+                    }
+                    
+                    return cleanBaseUrl + cleanPath;
+                });
+                
+                // 显示结果
+                resultBox.innerHTML = '';
+                results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.textContent = result;
+                    resultBox.appendChild(div);
+                });
+                
+                resultContainer.style.display = 'block';
+                successMessage.style.display = 'block';
+                
+                // 存储结果以供下载和复制
+                resultBox.dataset.results = results.join('\n');
+            });
+            
+            // 复制到剪贴板
+            copyBtn.addEventListener('click', function() {
+                const results = resultBox.dataset.results;
+                if (!results) return;
+                
+                navigator.clipboard.writeText(results).then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '已复制!';
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                });
+            });
+            
+            // 下载为文本文件
+            downloadBtn.addEventListener('click', function() {
+                const results = resultBox.dataset.results;
+                if (!results) return;
+                
+                const blob = new Blob([results], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '合并链接.txt';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            });
+            
+            // URL验证函数
+            function isValidUrl(string) {
+                if (string.trim() === '') return false;
+                
+                try {
+                    // 如果用户没有输入协议，添加临时协议进行验证
+                    const urlToCheck = string.includes('://') ? string : 'https://' + string;
+                    new URL(urlToCheck);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝塔邮局账号批量生成工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 20px;
+        }
+        
+        .controls {
+            flex: 1;
+            padding-right: 20px;
+        }
+        
+        .preview {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .generate-btn {
+            background: #2ecc71;
+        }
+        
+        .generate-btn:hover {
+            background: #27ae60;
+        }
+        
+        .save-btn {
+            background: #e74c3c;
+        }
+        
+        .save-btn:hover {
+            background: #c0392b;
+        }
+        
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        
+        .result-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .controls {
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>宝塔邮局账号批量生成工具</h1>
+            <p class="description">快速生成符合格式要求的邮箱账号</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="controls">
+                <div class="form-group">
+                    <label for="prefix">账号前缀（可选）</label>
+                    <input type="text" id="prefix" placeholder="例如：support">
+                </div>
+                
+                <div class="form-group">
+                    <label for="length">账号总长度</label>
+                    <input type="number" id="length" value="10" min="6" max="20">
+                </div>
+                
+                <div class="form-group">
+                    <label for="count">生成账号数量</label>
+                    <input type="number" id="count" value="5" min="1" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="domain">邮箱域名</label>
+                    <input type="text" id="domain" value="example.com">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="fixedPassword">
+                    <label for="fixedPassword">使用固定密码</label>
+                </div>
+                
+                <div class="form-group" id="fixedPasswordGroup" style="display: none;">
+                    <label for="password">固定密码</label>
+                    <input type="password" id="password" placeholder="输入固定密码">
+                </div>
+                
+                <button class="generate-btn" id="generateBtn">生成账号</button>
+                <button class="save-btn" id="saveBtn" disabled>保存到本地</button>
+            </div>
+            
+            <div class="preview">
+                <div class="result-header">生成结果预览</div>
+                <div id="resultContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 宝塔邮局账号生成工具 | 设计用于批量创建邮箱账号</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fixedPasswordCheckbox = document.getElementById('fixedPassword');
+            const fixedPasswordGroup = document.getElementById('fixedPasswordGroup');
+            const generateBtn = document.getElementById('generateBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            let generatedAccounts = [];
+            
+            // 显示/隐藏固定密码输入框
+            fixedPasswordCheckbox.addEventListener('change', function() {
+                fixedPasswordGroup.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // 生成随机字符串
+            function generateRandomString(length, useNumbers = true, useLetters = true) {
+                let chars = '';
+                if (useLetters) chars += 'abcdefghijklmnopqrstuvwxyz';
+                if (useNumbers) chars += '0123456789';
+                
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // 生成随机密码
+            function generatePassword() {
+                return generateRandomString(12, true, true);
+            }
+            
+            // 生成账号
+            generateBtn.addEventListener('click', function() {
+                const prefix = document.getElementById('prefix').value;
+                const totalLength = parseInt(document.getElementById('length').value);
+                const count = parseInt(document.getElementById('count').value);
+                const domain = document.getElementById('domain').value;
+                const useFixedPassword = document.getElementById('fixedPassword').checked;
+                const fixedPassword = document.getElementById('password').value;
+                
+                generatedAccounts = [];
+                resultContainer.innerHTML = '';
+                
+                for (let i = 0; i < count; i++) {
+                    // 生成随机部分
+                    const randomPartLength = prefix ? totalLength - prefix.length : totalLength;
+                    const randomPart = generateRandomString(randomPartLength, true, true);
+                    
+                    // 生成完整账号
+                    const username = prefix ? prefix + randomPart : randomPart;
+                    const email = username + '@' + domain;
+                    
+                    // 生成密码
+                    const password = useFixedPassword && fixedPassword ? fixedPassword : generatePassword();
+                    
+                    // 创建账号对象
+                    const account = {
+                        username: username,
+                        email: email,
+                        password: password,
+                        space: '5',
+                        unit: 'GB'
+                    };
+                    
+                    generatedAccounts.push(account);
+                    
+                    // 添加到预览
+                    const accountElement = document.createElement('div');
+                    accountElement.className = 'result-item';
+                    accountElement.textContent = `${account.username}|${account.email}|${account.password}|${account.space}|${account.unit}`;
+                    resultContainer.appendChild(accountElement);
+                }
+                
+                saveBtn.disabled = false;
+            });
+            
+            // 保存到本地
+            saveBtn.addEventListener('click', function() {
+                if (generatedAccounts.length === 0) return;
+                
+                let content = '';
+                for (const account of generatedAccounts) {
+                    content += `${account.email}----${account.password}\n`;
+                }
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bt_mail_accounts.txt';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

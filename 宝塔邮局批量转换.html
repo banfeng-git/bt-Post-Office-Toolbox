@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝塔邮局批量转换工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .input-section, .output-section {
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #copyBtn {
+            background: #27ae60;
+        }
+        
+        #copyBtn:hover {
+            background: #219653;
+        }
+        
+        #clearBtn {
+            background: #e74c3c;
+        }
+        
+        #clearBtn:hover {
+            background: #c0392b;
+        }
+        
+        .example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin-top: 20px;
+        }
+        
+        .example h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .example p {
+            font-family: monospace;
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>宝塔邮局批量转换工具</h1>
+        <p class="description">将宝塔邮局格式转换为指定格式：username|username@domain.com|password|5|GB</p>
+        
+        <div class="input-section">
+            <h2>输入（每行一个）</h2>
+            <textarea id="inputText" placeholder="请输入要转换的内容，每行一个，例如：
+user1@example.com----password123
+user2@example.com----password123
+..."></textarea>
+        </div>
+        
+        <div class="buttons">
+            <button id="convertBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                    <path d="M8 1a7 7 0 0 1 7 7v1h-2V8A5 5 0 0 0 3 8v1H1V8a7 7 0 0 1 7-7z"/>
+                    <path d="M7 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                </svg>
+                转换
+            </button>
+            <button id="copyBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                </svg>
+                复制结果
+            </button>
+            <button id="clearBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+                清空
+            </button>
+        </div>
+        
+        <div class="output-section">
+            <h2>转换结果</h2>
+            <textarea id="outputText" readonly></textarea>
+        </div>
+        
+        <div class="example">
+            <h3>示例</h3>
+            <p>输入: 52ksd2u3@example.com----123456</p>
+            <p>输出: 52ksd2u3|52ksd2u3@example.com|123456|5|GB</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>使用说明</h3>
+            <ul>
+                <li>在左侧输入框中粘贴或输入需要转换的内容，每行一个</li>
+                <li>点击"转换"按钮进行格式转换</li>
+                <li>转换完成后，结果会显示在右侧输出框中</li>
+                <li>点击"复制结果"按钮可以将输出内容复制到剪贴板</li>
+                <li>点击"清空"按钮可以清除所有输入和输出内容</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const convertBtn = document.getElementById('convertBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            // 转换功能
+            convertBtn.addEventListener('click', function() {
+                const input = inputText.value.trim();
+                if (!input) {
+                    outputText.value = '请输入要转换的内容';
+                    return;
+                }
+                
+                const lines = input.split('\n');
+                const outputLines = [];
+                
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) continue;
+                    
+                    // 检查格式是否正确
+                    if (!trimmedLine.includes('----')) {
+                        outputLines.push(`无效格式: ${trimmedLine}`);
+                        continue;
+                    }
+                    
+                    const [emailPart, password] = trimmedLine.split('----');
+                    const atIndex = emailPart.indexOf('@');
+                    
+                    if (atIndex === -1) {
+                        outputLines.push(`无效邮箱格式: ${emailPart}`);
+                        continue;
+                    }
+                    
+                    const username = emailPart.substring(0, atIndex);
+                    const domain = emailPart.substring(atIndex + 1);
+                    
+                    outputLines.push(`${username}|${emailPart}|${password}|5|GB`);
+                }
+                
+                outputText.value = outputLines.join('\n');
+            });
+            
+            // 复制功能
+            copyBtn.addEventListener('click', function() {
+                if (!outputText.value) {
+                    alert('没有内容可复制');
+                    return;
+                }
+                
+                outputText.select();
+                document.execCommand('copy');
+                
+                // 显示复制成功提示
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '已复制!';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 1500);
+            });
+            
+            // 清空功能
+            clearBtn.addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+        });
+    </script>
+</body>
+</html>
